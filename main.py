@@ -2,10 +2,18 @@ import json
 import os
 from typing import List, Dict, Any
 
-FILE_NAME = 'library.json'
+FILE_NAME = "library.json"
+
 
 class Book:
-    def __init__(self, book_id: int, title: str, author: str, year: str, status: str = 'в наличии') -> None:
+    def __init__(
+        self,
+        book_id: int,
+        title: str,
+        author: str,
+        year: str,
+        status: str = "в наличии",
+    ) -> None:
         self.id = book_id
         self.title = title
         self.author = author
@@ -14,22 +22,23 @@ class Book:
 
     def to_dict(self) -> Dict[str, Any]:
         return {
-            'id': self.id,
-            'title': self.title,
-            'author': self.author,
-            'year': self.year,
-            'status': self.status
+            "id": self.id,
+            "title": self.title,
+            "author": self.author,
+            "year": self.year,
+            "status": self.status,
         }
 
     @staticmethod
-    def from_dict(data: Dict[str, Any]) -> 'Book':
+    def from_dict(data: Dict[str, Any]) -> "Book":
         return Book(
-            book_id=data['id'],
-            title=data['title'],
-            author=data['author'],
-            year=data['year'],
-            status=data['status']
+            book_id=data["id"],
+            title=data["title"],
+            author=data["author"],
+            year=data["year"],
+            status=data["status"],
         )
+
 
 class Library:
     def __init__(self, filename: str = FILE_NAME) -> None:
@@ -39,7 +48,7 @@ class Library:
     def load_data(self) -> List[Book]:
         if not os.path.exists(self.filename):
             return []
-        with open(self.filename, 'r', encoding='utf-8') as file:
+        with open(self.filename, "r", encoding="utf-8") as file:
             try:
                 data = json.load(file)
                 return [Book.from_dict(book) for book in data]
@@ -47,8 +56,13 @@ class Library:
                 return []
 
     def save_data(self) -> None:
-        with open(self.filename, 'w', encoding='utf-8') as file:
-            json.dump([book.to_dict() for book in self.books], file, ensure_ascii=False, indent=4)
+        with open(self.filename, "w", encoding="utf-8") as file:
+            json.dump(
+                [book.to_dict() for book in self.books],
+                file,
+                ensure_ascii=False,
+                indent=4,
+            )
 
     def generate_id(self) -> int:
         if not self.books:
@@ -60,7 +74,9 @@ class Library:
             if book.title == title and book.author == author and book.year == year:
                 print(f"Книга '{title}' уже существует в библиотеке.")
                 return
-        new_book = Book(book_id=self.generate_id(), title=title, author=author, year=year)
+        new_book = Book(
+            book_id=self.generate_id(), title=title, author=author, year=year
+        )
         self.books.append(new_book)
         self.save_data()
         print(f"Книга '{title}' добавлена с ID {new_book.id}.")
@@ -74,7 +90,11 @@ class Library:
             print(f"Книга с ID {book_id} не найдена.")
 
     def find_books(self, search_by: str, search_value: str) -> List[Book]:
-        results = [book for book in self.books if str(getattr(book, search_by)).lower() == str(search_value).lower()]
+        results = [
+            book
+            for book in self.books
+            if str(getattr(book, search_by)).lower() == str(search_value).lower()
+        ]
         if results:
             for book in results:
                 print(book.to_dict())
@@ -98,6 +118,7 @@ class Library:
                 return
         print(f"Книга с ID {book_id} не найдена.")
 
+
 def main() -> None:
     library = Library()
     while True:
@@ -111,40 +132,41 @@ def main() -> None:
 
         choice = input("Выберите действие: ")
 
-        if choice == '1':
+        if choice == "1":
             title = input("Введите название книги: ")
             author = input("Введите автора книги: ")
             year = input("Введите год издания книги: ")
             library.add_book(title, author, year)
-        elif choice == '2':
+        elif choice == "2":
             try:
                 book_id = int(input("Введите ID книги для удаления: "))
                 library.delete_book(book_id)
             except ValueError:
                 print("Некорректный ID.")
-        elif choice == '3':
+        elif choice == "3":
             search_by = input("Искать по (title/author/year): ").lower()
-            if search_by in ['title', 'author', 'year']:
+            if search_by in ["title", "author", "year"]:
                 search_value = input(f"Введите значение для поиска по {search_by}: ")
                 library.find_books(search_by, search_value)
             else:
                 print("Некорректный параметр поиска.")
-        elif choice == '4':
+        elif choice == "4":
             library.display_books()
-        elif choice == '5':
+        elif choice == "5":
             try:
                 book_id = int(input("Введите ID книги для изменения статуса: "))
                 status = input("Введите новый статус (в наличии/выдана): ").lower()
-                if status in ['в наличии', 'выдана']:
+                if status in ["в наличии", "выдана"]:
                     library.update_status(book_id, status)
                 else:
                     print("Некорректный статус.")
             except ValueError:
                 print("Некорректный ID.")
-        elif choice == '6':
+        elif choice == "6":
             break
         else:
             print("Некорректный выбор. Попробуйте еще раз.")
+
 
 if __name__ == "__main__":
     main()
